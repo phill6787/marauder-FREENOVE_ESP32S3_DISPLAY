@@ -5,18 +5,23 @@ Install tools - in Windows to C:/users/$USER/documents/Arduino/tools
 
 In Arduino boards manager--->Using esp32 2.0.11 from Espressif Systems
 
-change stuff in arduino-ide-->tools-->flash size=16mb  //  partition-scheme= Huge app // PSRam= OPI PSRAM // USB-CDC-ON-BOOT=Enabled for UART commands  
-                                                 tools-->board-->esp32-->ESP32S3 Dev Module
+change stuff in arduino-ide-->tools-->flash size=16mb  //  
+                                      partition-scheme= Huge app // 
+                                      PSRam= OPI PSRAM // 
+                                      USB-CDC-ON-BOOT=Enabled for UART commands  //
+                                      
+change stuff in arduino-ide-->tools-->board-->esp32-->ESP32S3 Dev Module
+
+
+
+*Touch screen is disabled, enable in configs.h  
+*sd card type not supported , see the sd.md in Libraries+tools folder
 
 
 
 
 
-
-
-
-
-
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 

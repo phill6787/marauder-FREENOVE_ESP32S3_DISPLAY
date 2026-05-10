@@ -1,7 +1,7 @@
 🛠️ Step 1: Define SD_MMC pins and enable the feature in configs.h
 
 In your configs.h, inside the FREENOVE_ESP32S3_DISPLAY block, add these lines before the #endif:
-cpp
+```cpp
 
 #ifdef FREENOVE_ESP32S3_DISPLAY
     #define HAS_SCREEN
@@ -25,14 +25,14 @@ cpp
     // Tell the code we are using SD_MMC, not SPI
     #define USE_SD_MMC
 #endif
-
+```
 Important: Remove any existing SD_CS definition for this board – we won't need it.
 🛠️ Step 2: Modify SDInterface.cpp to support SD_MMC
 
 Open SDInterface.cpp and find the initSD() function. Add a new branch for USE_SD_MMC before the existing SPI code.
 
 At the top of the function, add:
-cpp
+```cpp
 
 bool SDInterface::initSD() {
 #ifdef USE_SD_MMC
@@ -61,11 +61,11 @@ bool SDInterface::initSD() {
     ...
 #endif
 }
-
+```
     Note: The original function uses SD (the global SPI object). For SD_MMC, you must change every SD. to SD_MMC. (e.g., SD_MMC.open, SD_MMC.exists). To keep it clean, you can copy the whole existing logic and replace SD with SD_MMC inside the #ifdef USE_SD_MMC block.
 
 Here is a complete replacement for the initSD() function that supports both SPI and SD_MMC:
-cpp
+```cpp
 
 bool SDInterface::initSD() {
 #ifdef USE_SD_MMC
@@ -107,7 +107,7 @@ File SDInterface::getFile(String path) {
     return File();
 #endif
 }
-
+```
 Do the same for removeFile, listDirToLinkedList, etc. – wherever SD. appears, duplicate the line with SD_MMC. inside a #ifdef USE_SD_MMC.
 🧪 Step 3: Recompile and test
 

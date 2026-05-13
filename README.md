@@ -12,7 +12,7 @@ change stuff in arduino-ide-->tools-->board-->esp32-->ESP32S3 Dev Module
 
 
 *Touch screen is disabled, enable in configs.h  
-*sd card type not supported , see the sd.md in Libraries+tools folder
+*sd card type not supported 
 
 
 

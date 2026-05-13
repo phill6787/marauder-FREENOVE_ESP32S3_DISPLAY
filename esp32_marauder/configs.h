@@ -862,6 +862,22 @@
       #define U_PULL true
       #define R_PULL true
       #define D_PULL true
+
+      // Analog Joystick (Freenove ESP32S3 Display)
+      #define HAS_JOYSTICK
+      #define JOY_X_PIN 2    // ADC1_CH3
+      #define JOY_Y_PIN 3    // ADC1_CH4
+      #define JOY_BTN_PIN 14  // Digital (INPUT_PULLUP, LOW = pressed)
+
+      // ADC thresholds for joystick directions (12-bit ADC, 0-4095)
+      #define JOY_THRESHOLD_LOW  500
+      #define JOY_THRESHOLD_HIGH 3500
+
+      // Emulated button pins for joystick directions
+      #define JOY_U_PIN  100   // Emulated
+      #define JOY_D_PIN  101   // Emulated
+      #define JOY_L_PIN  102   // Emulated
+      #define JOY_R_PIN  103   // Emulated
     #endif
 
   #endif

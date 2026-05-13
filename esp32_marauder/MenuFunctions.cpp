@@ -877,6 +877,179 @@ void MenuFunctions::main(uint32_t currentTime)
       }
       #endif
 
+      // ============================================================
+      // ANALOG JOYSTICK NAVIGATION (Freenove ESP32S3 Display, etc.)
+      // ============================================================
+      #ifdef HAS_JOYSTICK
+        // --- UP (menu navigation / channel up) ---
+        if (joystick.upPressed()) {
+          if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_OFF) ||
+              (wifi_scan_obj.currentScanMode == WIFI_CONNECTED) ||
+              (wifi_scan_obj.currentScanMode == OTA_UPDATE)) {
+            if (current_menu->selected > 0) {
+              current_menu->selected--;
+              if (current_menu->selected < this->menu_start_index) {
+                this->buildButtons(current_menu, current_menu->selected);
+                this->displayCurrentMenu(current_menu->selected);
+              }
+              this->buttonSelected(current_menu->selected - this->menu_start_index, current_menu->selected);
+              if (!current_menu->list->get(current_menu->selected + 1).selected)
+                this->buttonNotSelected(current_menu->selected + 1 - this->menu_start_index, current_menu->selected + 1);
+            } else {
+              current_menu->selected = current_menu->list->size() - 1;
+              if (current_menu->selected >= BUTTON_SCREEN_LIMIT) {
+                this->buildButtons(current_menu, current_menu->selected + 1 - BUTTON_SCREEN_LIMIT);
+                this->displayCurrentMenu(current_menu->selected + 1 - BUTTON_SCREEN_LIMIT);
+              }
+              this->buttonSelected(current_menu->selected, current_menu->selected);
+              if (!current_menu->list->get(0).selected)
+                this->buttonNotSelected(0, this->menu_start_index);
+            }
+          }
+          else if ((wifi_scan_obj.currentScanMode == WIFI_PACKET_MONITOR) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_EAPOL) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_CHAN_ANALYZER) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_PACKET_RATE) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_RAW_CAPTURE) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_AP) ||
+                   (wifi_scan_obj.currentScanMode == BT_SCAN_FLOCK) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_PROBE) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_DEAUTH) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_SIG_STREN)) {
+            #ifndef HAS_DUAL_BAND
+              if (wifi_scan_obj.set_channel < 14)
+                wifi_scan_obj.changeChannel(wifi_scan_obj.set_channel + 1);
+              else
+                wifi_scan_obj.changeChannel(1);
+            #else
+              if (wifi_scan_obj.dual_band_channel_index < DUAL_BAND_CHANNELS - 1)
+                wifi_scan_obj.dual_band_channel_index++;
+              else
+                wifi_scan_obj.dual_band_channel_index = 0;
+              wifi_scan_obj.changeChannel(wifi_scan_obj.dual_band_channels[wifi_scan_obj.dual_band_channel_index]);
+            #endif
+          }
+          else if (wifi_scan_obj.currentScanMode == WIFI_SCAN_CHAN_ACT) {
+            #ifndef HAS_DUAL_BAND
+              if (wifi_scan_obj.activity_page < MAX_CHANNEL / CHAN_PER_PAGE)
+                wifi_scan_obj.activity_page++;
+            #else
+              if (wifi_scan_obj.activity_page < DUAL_BAND_CHANNELS / CHAN_PER_PAGE)
+                wifi_scan_obj.activity_page++;
+            #endif
+            wifi_scan_obj.drawChannelLine();
+          }
+        }
+
+        // --- DOWN (menu navigation / channel down) ---
+        if (joystick.downPressed()) {
+          if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_OFF) ||
+              (wifi_scan_obj.currentScanMode == WIFI_CONNECTED) ||
+              (wifi_scan_obj.currentScanMode == OTA_UPDATE)) {
+            if (current_menu->selected < current_menu->list->size() - 1) {
+              current_menu->selected++;
+              if (current_menu->selected - this->menu_start_index >= BUTTON_SCREEN_LIMIT) {
+                this->buildButtons(current_menu, current_menu->selected + 1 - BUTTON_SCREEN_LIMIT);
+                this->displayCurrentMenu(current_menu->selected + 1 - BUTTON_SCREEN_LIMIT);
+              }
+              else
+                this->buttonSelected(current_menu->selected - this->menu_start_index, current_menu->selected);
+              if (!current_menu->list->get(current_menu->selected - 1).selected)
+                this->buttonNotSelected(current_menu->selected - 1 - this->menu_start_index, current_menu->selected - 1);
+            } else {
+              if (current_menu->selected >= BUTTON_SCREEN_LIMIT) {
+                current_menu->selected = 0;
+                this->buildButtons(current_menu);
+                this->displayCurrentMenu();
+                this->buttonSelected(current_menu->selected);
+              } else {
+                current_menu->selected = 0;
+                this->buttonSelected(current_menu->selected);
+                if (!current_menu->list->get(current_menu->list->size() - 1).selected)
+                  this->buttonNotSelected(current_menu->list->size() - 1);
+              }
+            }
+          }
+          else if ((wifi_scan_obj.currentScanMode == WIFI_PACKET_MONITOR) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_EAPOL) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_CHAN_ANALYZER) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_PACKET_RATE) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_RAW_CAPTURE) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_AP) ||
+                   (wifi_scan_obj.currentScanMode == BT_SCAN_FLOCK) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_PROBE) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_DEAUTH) ||
+                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_SIG_STREN)) {
+            #ifndef HAS_DUAL_BAND
+              if (wifi_scan_obj.set_channel > 1)
+                wifi_scan_obj.changeChannel(wifi_scan_obj.set_channel - 1);
+              else
+                wifi_scan_obj.changeChannel(14);
+            #else
+              if (wifi_scan_obj.dual_band_channel_index > 0)
+                wifi_scan_obj.dual_band_channel_index--;
+              else
+                wifi_scan_obj.dual_band_channel_index = DUAL_BAND_CHANNELS - 1;
+              wifi_scan_obj.changeChannel(wifi_scan_obj.dual_band_channels[wifi_scan_obj.dual_band_channel_index]);
+            #endif
+          }
+          else if (wifi_scan_obj.currentScanMode == WIFI_SCAN_CHAN_ACT) {
+            #ifndef HAS_DUAL_BAND
+              if (wifi_scan_obj.activity_page > 1)
+                wifi_scan_obj.activity_page--;
+            #else
+              if (wifi_scan_obj.activity_page > 0)
+                wifi_scan_obj.activity_page--;
+            #endif
+            wifi_scan_obj.drawChannelLine();
+          }
+        }
+
+        // --- LEFT (channel down when menu not active) ---
+        if (joystick.leftPressed()) {
+          if (wifi_scan_obj.currentScanMode == WIFI_SCAN_OFF) {
+            #ifndef HAS_DUAL_BAND
+              if (wifi_scan_obj.set_channel > 1)
+                wifi_scan_obj.changeChannel(wifi_scan_obj.set_channel - 1);
+              else
+                wifi_scan_obj.changeChannel(14);
+            #else
+              if (wifi_scan_obj.dual_band_channel_index > 0)
+                wifi_scan_obj.dual_band_channel_index--;
+              else
+                wifi_scan_obj.dual_band_channel_index = DUAL_BAND_CHANNELS - 1;
+              wifi_scan_obj.changeChannel(wifi_scan_obj.dual_band_channels[wifi_scan_obj.dual_band_channel_index]);
+            #endif
+          }
+        }
+
+        // --- RIGHT (channel up when menu not active) ---
+        if (joystick.rightPressed()) {
+          if (wifi_scan_obj.currentScanMode == WIFI_SCAN_OFF) {
+            #ifndef HAS_DUAL_BAND
+              if (wifi_scan_obj.set_channel < 14)
+                wifi_scan_obj.changeChannel(wifi_scan_obj.set_channel + 1);
+              else
+                wifi_scan_obj.changeChannel(1);
+            #else
+              if (wifi_scan_obj.dual_band_channel_index < DUAL_BAND_CHANNELS - 1)
+                wifi_scan_obj.dual_band_channel_index++;
+              else
+                wifi_scan_obj.dual_band_channel_index = 0;
+              wifi_scan_obj.changeChannel(wifi_scan_obj.dual_band_channels[wifi_scan_obj.dual_band_channel_index]);
+            #endif
+          }
+        }
+
+        // --- SELECT (joystick push = same as center button) ---
+        if (joystick.btnPressed()) {
+          current_menu->list->get(current_menu->selected).callable();
+        }
+      #endif
+      // ============================================================
+      // END JOYSTICK NAVIGATION
+      // ============================================================
+
       if(c_btn_press){
         current_menu->list->get(current_menu->selected).callable();
       }

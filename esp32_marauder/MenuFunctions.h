@@ -39,6 +39,11 @@
   #if (C_BTN >= 0)
     extern Switches c_btn;
   #endif
+
+  #ifdef HAS_JOYSTICK
+    #include "Joystick.h"
+    extern Joystick joystick;
+  #endif
 #endif
 
 extern WiFiScan wifi_scan_obj;

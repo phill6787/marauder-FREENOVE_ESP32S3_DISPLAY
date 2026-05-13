@@ -67,6 +67,11 @@ https://www.online-utility.org/image/convert/to/XBM
     Switches c_btn = Switches(C_BTN, 1000, C_PULL);
   #endif
 
+  #ifdef HAS_JOYSTICK
+    #include "Joystick.h"
+    Joystick joystick;
+  #endif
+
 #endif
 
 WiFiScan wifi_scan_obj;
@@ -388,6 +393,10 @@ void setup()
     gps_obj.begin();
   #endif
 
+  #ifdef HAS_JOYSTICK
+    joystick.begin();
+  #endif
+
   #ifdef HAS_SCREEN  
     display_obj.tft.setTextColor(TFT_WHITE, TFT_BLACK);
   #endif
@@ -456,6 +465,11 @@ void loop()
   #ifdef HAS_BATTERY
     battery_obj.main(currentTime);
   #endif
+
+  #ifdef HAS_JOYSTICK
+    joystick.update();
+  #endif
+
   if ((wifi_scan_obj.currentScanMode != WIFI_PACKET_MONITOR) ||
       (mini)) {
     #ifdef HAS_SCREEN

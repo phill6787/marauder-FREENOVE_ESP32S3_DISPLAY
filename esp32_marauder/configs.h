@@ -545,8 +545,15 @@
     #define HAS_BT_REMOTE 
     #define HAS_SEPARATE_SD
     #define HAS_CYD_PORTRAIT
+    #define HAS_BATTERY
+    #define HAS_NEOPIXEL_LED
     //#define HAS_DUAL_BAND
-  // #define HAS_TOUCH // Uncomment ONLY if your specific model has a touchscreen
+    // #define HAS_TOUCH // Uncomment ONLY if your specific model has a touchscreen
+    #ifdef FREENOVE_ESP32S3_DISPLAY
+      #define HAS_BATTERY
+      #define BATTERY_ADC_PIN 9
+      #define HAS_NEOPIXEL_LED
+    #endif
   #endif
   //// END BOARD FEATURES
 
@@ -2039,7 +2046,11 @@
       #define TFT_DC    46
       #define TFT_RST   -1
       #define TFT_BL    45
+      #define SCREEN_CHAR_WIDTH 40
+      //#define HAS_ILI9341
     
+      #define BANNER_TEXT_SIZE 2
+
       #ifndef TFT_WIDTH
         #define TFT_WIDTH 240
       #endif
@@ -2047,59 +2058,59 @@
       #ifndef TFT_HEIGHT
         #define TFT_HEIGHT 320
       #endif
-    
-      // Required macros
-      #define YMAX                TFT_HEIGHT
-      #define BOT_FIXED_AREA      0
-      #define TOP_FIXED_AREA      48
-      #define TEXT_HEIGHT         20           // Increased for better visibility
-      #define CHAR_WIDTH          20
-      #define HEIGHT_1            TFT_WIDTH
-      #define WIDTH_1             TFT_HEIGHT
-      #define SCREEN_ORIENTATION  0            // Landscape
-      #define GRAPH_VERT_LIM      (TFT_HEIGHT/2 - 1)
-      #define BANNER_TEXT_SIZE    2
-      #define SCREEN_WIDTH        TFT_WIDTH
-      #define SCREEN_HEIGHT       TFT_HEIGHT
-      #define STANDARD_FONT_CHAR_LIMIT (TFT_WIDTH/6)
+
+      #define GRAPH_VERT_LIM TFT_HEIGHT/2 - 1
+
+      #define TFT_DIY
+
       #define SCREEN_BUFFER
-      #define MAX_SCREEN_BUFFER   21
+
+      #define MAX_SCREEN_BUFFER 22
+
+      #define EXT_BUTTON_WIDTH 0
+
+      #define SCREEN_ORIENTATION 0
     
-      // Menu button dimensions (for non‑touch text menu)
-      #define KEY_X               (TFT_WIDTH/2)
-      #define KEY_Y               (TFT_HEIGHT/4.5)
-      #define KEY_W               TFT_WIDTH
-      #define KEY_H               (TFT_HEIGHT/12.8)
-      #define KEY_SPACING_X       0
-      #define KEY_SPACING_Y       1
-      #define KEY_TEXTSIZE        1
-      #define BUTTON_PADDING      10
-      #define EXT_BUTTON_WIDTH    40
-      #define BUTTON_SCREEN_LIMIT 8
-      #define BUTTON_ARRAY_LEN    BUTTON_SCREEN_LIMIT
-      #define STATUS_BAR_WIDTH    16
+      #define CHAR_WIDTH 12
+      #define SCREEN_WIDTH TFT_WIDTH
+      #define SCREEN_HEIGHT TFT_HEIGHT
+      #define HEIGHT_1 TFT_WIDTH
+      #define WIDTH_1 TFT_HEIGHT
+      #define STANDARD_FONT_CHAR_LIMIT (TFT_WIDTH/6) // number of characters on a single line with normal font
+      #define TEXT_HEIGHT 16 // Height of text to be printed and scrolled
+      #define BOT_FIXED_AREA 0 // Number of lines in bottom fixed area (lines counted from bottom of screen)
+      #define TOP_FIXED_AREA 48 // Number of lines in top fixed area (lines counted from top of screen)
+      #define YMAX 320 // Bottom of screen area
+      #define minimum(a,b)     (((a) < (b)) ? (a) : (b))
+      //#define MENU_FONT NULL
+      #define MENU_FONT &FreeMono9pt7b // Winner
+      //#define MENU_FONT &FreeMonoBold9pt7b
+      //#define MENU_FONT &FreeSans9pt7b
+      //#define MENU_FONT &FreeSansBold9pt7b
+      #define BUTTON_SCREEN_LIMIT 12
+      #define BUTTON_ARRAY_LEN BUTTON_SCREEN_LIMIT
+      #define STATUS_BAR_WIDTH 16
+      #define LVGL_TICK_PERIOD 6
+
+      #define FRAME_X 100
+      #define FRAME_Y 64
+      #define FRAME_W 120
+      #define FRAME_H 50
     
-      // Frames & colors (unchanged)
-      #define FRAME_X             100
-      #define FRAME_Y             64
-      #define FRAME_W             120
-      #define FRAME_H             50
-      #define REDBUTTON_X         FRAME_X
-      #define REDBUTTON_Y         FRAME_Y
-      #define REDBUTTON_W         (FRAME_W/2)
-      #define REDBUTTON_H         FRAME_H
-      #define GREENBUTTON_X       (REDBUTTON_X + REDBUTTON_W)
-      #define GREENBUTTON_Y       FRAME_Y
-      #define GREENBUTTON_W       (FRAME_W/2)
-      #define GREENBUTTON_H       FRAME_H
+      // Red zone size
+      #define REDBUTTON_X FRAME_X
+      #define REDBUTTON_Y FRAME_Y
+      #define REDBUTTON_W (FRAME_W/2)
+      #define REDBUTTON_H FRAME_H
     
-      #define STATUSBAR_COLOR     0x4A49
-      #define LVGL_TICK_PERIOD    6
+      // Green zone size
+      #define GREENBUTTON_X (REDBUTTON_X + REDBUTTON_W)
+      #define GREENBUTTON_Y FRAME_Y
+      #define GREENBUTTON_W (FRAME_W/2)
+      #define GREENBUTTON_H FRAME_H
     
-      // Timing & menu
-      #define BANNER_TIME         100
-      #define MENU_FONT           &FreeMono9pt7b
-    
+      #define STATUSBAR_COLOR 0x4A49
+
       // CRITICAL: Tell the code there is no touch screen
       #define NO_TOUCH_EXIT_BUTTON
     
@@ -2391,21 +2402,22 @@
   #endif
 
   #ifdef FREENOVE_ESP32S3_DISPLAY
-    #define BANNER_TIME 50
+    #define BANNER_TIME 100
     
     #define COMMAND_PREFIX "!"
     
     // Keypad start position, key sizes and spacing
-    #define KEY_X (TFT_WIDTH/2) // Centre of key
-    #define KEY_Y (TFT_HEIGHT/4.5)
-    #define KEY_W TFT_WIDTH // Width and height
-    #define KEY_H (TFT_HEIGHT/12.8)
+    #define KEY_X 120 // Centre of key
+    #define KEY_Y 50
+    #define KEY_W 240 // Width and height
+    #define KEY_H 22
     #define KEY_SPACING_X 0 // X and Y gap
     #define KEY_SPACING_Y 1
     #define KEY_TEXTSIZE 1   // Font size multiplier
     #define ICON_W 22
     #define ICON_H 22
-    #define BUTTON_PADDING 10
+    #define BUTTON_PADDING 22
+    //#define BUTTON_ARRAY_LEN 5
   #endif
   //// END MENU DEFINITIONS
 
@@ -2637,6 +2649,8 @@
       #define PIN 27
     #elif defined(MARAUDER_CARDPUTER_ADV)
       #define PIN 21
+    #elif defined(FREENOVE_ESP32S3_DISPLAY)
+      #define PIN 42
     #else
       #define PIN 25
     #endif
@@ -2819,6 +2833,10 @@
       #define I2C_SDA 5
     #endif
 
+    #ifdef FREENOVE_ESP32S3_DISPLAY
+      #define I2C_SCL 15
+      #define I2c_SDA 16
+    #endif
   #endif
 
   //// MARAUDER TITLE STUFF
@@ -2951,6 +2969,12 @@
     #endif
 
     #ifdef MARAUDER_MINI_V3
+      #define SD_MISO TFT_MISO
+      #define SD_MOSI TFT_MOSI
+      #define SD_SCK  TFT_SCLK
+    #endif
+
+    #ifdef FREENOVE_ESP32S3_DISPLAY
       #define SD_MISO TFT_MISO
       #define SD_MOSI TFT_MOSI
       #define SD_SCK  TFT_SCLK

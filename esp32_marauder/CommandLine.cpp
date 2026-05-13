@@ -13,7 +13,7 @@ void CommandLine::RunSetup() {
   Serial.println(F("         ESP32 Marauder      \n"));
   Serial.println("            " + version_number + "\n");
   Serial.println(F("       By: justcallmekoko\n"));
-  Serial.println(F("--------------------------------\n\n"));
+  Serial.println(F("-------------------------------------\n\n"));
   
   Serial.print("> ");
 }
@@ -100,14 +100,14 @@ bool CommandLine::inRange(int max, int index) {
   return false;
 }
 
-/*bool CommandLine::apSelected() {
+bool CommandLine::apSelected() {
   for (int i = 0; i < access_points->size(); i++) {
     if (access_points->get(i).selected)
       return true;
   }
 
   return false;
-}*/
+}
 
 bool CommandLine::hasSSIDs() {
   if (ssids->size() == 0)
@@ -536,12 +536,12 @@ void CommandLine::runCommand(String input) {
     // Signal strength scan
     if (cmd_args.get(0) == SIGSTREN_CMD) {
       this->startScanFromCLI(WIFI_SCAN_SIG_STREN, TFT_MAGENTA, "Signal Strength Scan");
-      /*Serial.println(STOPSCAN_CMD);
+      Serial.println(STOPSCAN_CMD);
       #ifdef HAS_SCREEN
         display_obj.clearScreen();
         menu_function_obj.drawStatusBar();
       #endif
-      wifi_scan_obj.StartScan(WIFI_SCAN_SIG_STREN, TFT_MAGENTA);*/
+      wifi_scan_obj.StartScan(WIFI_SCAN_SIG_STREN, TFT_MAGENTA);
       wifi_scan_obj.renderPacketRate();
     }
     // Packet count
@@ -552,7 +552,7 @@ void CommandLine::runCommand(String input) {
     else if (cmd_args.get(0) == WARDRIVE_CMD) {
       #ifdef HAS_GPS
         if (gps_obj.getGpsModuleStatus()) {
-          //int sta_sw = this->argSearch(&cmd_args, "-s");
+          int sta_sw = this->argSearch(&cmd_args, "-s");
           this->startScanFromCLI(WIFI_SCAN_WAR_DRIVE, TFT_GREEN, "Wardrive");
         }
       #else
@@ -575,12 +575,12 @@ void CommandLine::runCommand(String input) {
 
       if (evil_portal_obj.setAP(probe_req_ssids->get(pr_index).essid)) {
         this->startScanFromCLI(WIFI_SCAN_EVIL_PORTAL, TFT_ORANGE, "Karma Attack");
-        /*Serial.println(STOPSCAN_CMD);
+        Serial.println(STOPSCAN_CMD);
         #ifdef HAS_SCREEN
           display_obj.clearScreen();
           menu_function_obj.drawStatusBar();
         #endif
-        wifi_scan_obj.StartScan(WIFI_SCAN_EVIL_PORTAL, TFT_ORANGE);*/
+        wifi_scan_obj.StartScan(WIFI_SCAN_EVIL_PORTAL, TFT_ORANGE);
         wifi_scan_obj.setMac();
       }
       else {
@@ -716,12 +716,12 @@ void CommandLine::runCommand(String input) {
     // MAC Tracking
     else if (cmd_args.get(0) == MAC_TRACK_CMD) {
       this->startScanFromCLI(WIFI_SCAN_DETECT_FOLLOW, TFT_MAGENTA, "MAC Tracker");
-      /*Serial.println(STOPSCAN_CMD);
+      Serial.println(STOPSCAN_CMD);
       #ifdef HAS_SCREEN
         display_obj.clearScreen();
         menu_function_obj.drawStatusBar();
       #endif
-      wifi_scan_obj.StartScan(WIFI_SCAN_DETECT_FOLLOW, TFT_MAGENTA);*/
+      wifi_scan_obj.StartScan(WIFI_SCAN_DETECT_FOLLOW, TFT_MAGENTA);
     }
 
 
@@ -862,44 +862,44 @@ void CommandLine::runCommand(String input) {
           // Attack all
           if (targ_sw == -1) {
             this->startScanFromCLI(WIFI_ATTACK_BAD_MSG, TFT_RED, "Bad Msg attack against all stations");
-            /*Serial.prinln((String)STOPSCAN_CMD);
+            Serial.println((String)STOPSCAN_CMD);
             #ifdef HAS_SCREEN
               display_obj.clearScreen();
               menu_function_obj.drawStatusBar();
             #endif
-            wifi_scan_obj.StartScan(WIFI_ATTACK_BAD_MSG, TFT_RED);*/
+            wifi_scan_obj.StartScan(WIFI_ATTACK_BAD_MSG, TFT_RED);
           }
           // Target clients
           else {
             this->startScanFromCLI(WIFI_ATTACK_BAD_MSG_TARGETED, TFT_YELLOW, "targeted Bad Msg attack");
-            /*Serial.println(STOPSCAN_CMD);
+            Serial.println(STOPSCAN_CMD);
             #ifdef HAS_SCREEN
               display_obj.clearScreen();
               menu_function_obj.drawStatusBar();
             #endif
-            wifi_scan_obj.StartScan(WIFI_ATTACK_BAD_MSG_TARGETED, TFT_YELLOW);*/
+            wifi_scan_obj.StartScan(WIFI_ATTACK_BAD_MSG_TARGETED, TFT_YELLOW);
           }
         }
         else if (attack_type == ATTACK_TYPE_S) {
           // Attack all
           if (targ_sw == -1) {
             this->startScanFromCLI(WIFI_ATTACK_SLEEP, TFT_RED, "Sleep attack against all stations");
-            /*Serial.println(STOPSCAN_CMD);
+            Serial.println(STOPSCAN_CMD);
             #ifdef HAS_SCREEN
               display_obj.clearScreen();
               menu_function_obj.drawStatusBar();
             #endif
-            wifi_scan_obj.StartScan(WIFI_ATTACK_SLEEP, TFT_RED);*/
+            wifi_scan_obj.StartScan(WIFI_ATTACK_SLEEP, TFT_RED);
           }
           // Target clients
           else {
             this->startScanFromCLI(WIFI_ATTACK_SLEEP_TARGETED, TFT_MAGENTA, "targeted Sleep attack");
-            /*Serial.println(STOPSCAN_CMD);
+            Serial.println(STOPSCAN_CMD);
             #ifdef HAS_SCREEN
               display_obj.clearScreen();
               menu_function_obj.drawStatusBar();
             #endif
-            wifi_scan_obj.StartScan(WIFI_ATTACK_SLEEP_TARGETED, TFT_MAGENTA);*/
+            wifi_scan_obj.StartScan(WIFI_ATTACK_SLEEP_TARGETED, TFT_MAGENTA);
           }
         }
         else if (attack_type == ATTACK_TYPE_BEACON) {

@@ -2819,7 +2819,13 @@ void WiFiScan::startPcap(String file_name) {
   buffer_obj.pcapOpen(
     file_name,
     #if defined(HAS_SD)
-      sd_obj.supported ? &SD :
+      sd_obj.supported ? (
+        #ifdef USE_SD_MMC
+          (fs::FS*)&SD_MMC
+        #else
+          (fs::FS*)&SD
+        #endif
+      ) :
     #endif
     NULL,
     save_serial // Set with commandline options
@@ -2830,7 +2836,13 @@ void WiFiScan::startLog(String file_name) {
   buffer_obj.logOpen(
     file_name,
     #if defined(HAS_SD)
-      sd_obj.supported ? &SD :
+      sd_obj.supported ? (
+        #ifdef USE_SD_MMC
+          (fs::FS*)&SD_MMC
+        #else
+          (fs::FS*)&SD
+        #endif
+      ) :
     #endif
     NULL,
     save_serial // Set with commandline options
@@ -2841,7 +2853,13 @@ void WiFiScan::startGPX(String file_name) {
   buffer_obj.gpxOpen(
     file_name,
     #if defined(HAS_SD)
-      sd_obj.supported ? &SD :
+      sd_obj.supported ? (
+        #ifdef USE_SD_MMC
+          (fs::FS*)&SD_MMC
+        #else
+          (fs::FS*)&SD
+        #endif
+      ) :
     #endif
     NULL,
     save_serial // Set with commandline options
@@ -4696,10 +4714,17 @@ void WiFiScan::executeWarDrive() {
 void WiFiScan::openPoiFile() {
   #if defined(HAS_GPS) && defined(HAS_SD)
     int fileIndex = 0;
-    while (SD.exists("/wardrive_poi_" + String(fileIndex) + ".gpx"))
-      fileIndex++;
-    poiFileName = "/wardrive_poi_" + String(fileIndex) + ".gpx";
-    poiFile = SD.open(poiFileName, FILE_WRITE);
+    #ifdef USE_SD_MMC
+      while (SD_MMC.exists("/wardrive_poi_" + String(fileIndex) + ".gpx"))
+        fileIndex++;
+      poiFileName = "/wardrive_poi_" + String(fileIndex) + ".gpx";
+      poiFile = SD_MMC.open(poiFileName, FILE_WRITE);
+    #else
+      while (SD.exists("/wardrive_poi_" + String(fileIndex) + ".gpx"))
+        fileIndex++;
+      poiFileName = "/wardrive_poi_" + String(fileIndex) + ".gpx";
+      poiFile = SD.open(poiFileName, FILE_WRITE);
+    #endif
     if (poiFile) {
       poiFile.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gpx version=\"1.1\" creator=\"ESP32Marauder\">\n");
       poiFile.close();
@@ -4713,7 +4738,11 @@ void WiFiScan::closePoiFile() {
   #if defined(HAS_GPS) && defined(HAS_SD)
     if (poiFileOpen) {
       if (poiCount > 0) {
-        poiFile = SD.open(poiFileName, FILE_APPEND);
+        #ifdef USE_SD_MMC
+          poiFile = SD_MMC.open(poiFileName, FILE_APPEND);
+        #else
+          poiFile = SD.open(poiFileName, FILE_APPEND);
+        #endif
         if (poiFile) {
           poiFile.print("</gpx>\n");
           poiFile.close();
@@ -4749,7 +4778,11 @@ void WiFiScan::tagPOI(const char* label) {
     datetime.replace(" ", "T");
     datetime += "Z";
 
-    poiFile = SD.open(poiFileName, FILE_APPEND);
+    #ifdef USE_SD_MMC
+      poiFile = SD_MMC.open(poiFileName, FILE_APPEND);
+    #else
+      poiFile = SD.open(poiFileName, FILE_APPEND);
+    #endif
     if (poiFile) {
       poiFile.print("  <wpt lat=\"" + gps_obj.getLat() + "\" lon=\"" + gps_obj.getLon() + "\">\n");
       poiFile.print("    <ele>" + String(gps_obj.getAlt(), 2) + "</ele>\n");

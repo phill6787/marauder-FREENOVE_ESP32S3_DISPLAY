@@ -7,13 +7,27 @@
 #endif
 
 bool SDInterface::initSD() {
-  #ifdef FREENOVE_ESP32S3_DISPLAY
-    // This board uses SD_MMC (4-bit mode), not SPI.
-    // Returning false avoids all SPI SD code.
-    this->supported = false;
-    return false;
+  #ifdef USE_SD_MMC
+    // ========== SD_MMC (4-bit mode) ==========
+    // Set custom pins for the Freenove ESP32-S3 Display
+    SD_MMC.setPins(SDMMC_CLK, SDMMC_CMD, SDMMC_D0, SDMMC_D1, SDMMC_D2, SDMMC_D3);
+    if (!SD_MMC.begin("/sdcard", false, false)) {
+        Serial.println("SD_MMC mount failed");
+        this->supported = false;
+        return false;
+    }
+    this->supported = true;
+    this->cardType = SD_MMC.cardType();
+    this->cardSizeMB = SD_MMC.cardSize() / (1024 * 1024);
+    char sz[10];
+    sprintf(sz, "%d", (int)this->cardSizeMB);
+    this->card_sz = String(sz);
+    if (!SD_MMC.exists("/SCRIPTS")) SD_MMC.mkdir("/SCRIPTS");
+    this->sd_files = new LinkedList<String>();
+    Serial.printf("SD_MMC mounted, size: %d MB\n", (int)this->cardSizeMB);
+    return true;
   #endif
-  
+
   #ifdef HAS_SD
     String display_string = "";
     #ifdef KIT
@@ -100,15 +114,22 @@ bool SDInterface::initSD() {
 
 File SDInterface::getFile(String path) {
   if (this->supported) {
-    File file = SD.open(path, FILE_READ);
-
-    //if (file)
+    #ifdef USE_SD_MMC
+      File file = SD_MMC.open(path, FILE_READ);
+    #else
+      File file = SD.open(path, FILE_READ);
+    #endif
     return file;
   }
+  return File();
 }
 
 bool SDInterface::removeFile(String file_path) {
-  if (SD.remove(file_path))
+  #ifdef USE_SD_MMC
+    if (SD_MMC.remove(file_path))
+  #else
+    if (SD.remove(file_path))
+  #endif
     return true;
   else
     return false;
@@ -116,7 +137,11 @@ bool SDInterface::removeFile(String file_path) {
 
 void SDInterface::listDirToLinkedList(LinkedList<String>* file_names, String str_dir, String ext) {
   if (this->supported) {
-    File dir = SD.open(str_dir);
+    #ifdef USE_SD_MMC
+      File dir = SD_MMC.open(str_dir);
+    #else
+      File dir = SD.open(str_dir);
+    #endif
     while (true)
     {
       File entry = dir.openNextFile();
@@ -142,7 +167,11 @@ void SDInterface::listDirToLinkedList(LinkedList<String>* file_names, String str
 
 void SDInterface::listDir(String str_dir){
   if (this->supported) {
-    File dir = SD.open(str_dir);
+    #ifdef USE_SD_MMC
+      File dir = SD_MMC.open(str_dir);
+    #else
+      File dir = SD.open(str_dir);
+    #endif
     while (true)
     {
       File entry = dir.openNextFile();
@@ -150,10 +179,6 @@ void SDInterface::listDir(String str_dir){
       {
         break;
       }
-      //for (uint8_t i = 0; i < numTabs; i++)
-      //{
-      //  Serial.print('\t');
-      //}
       Serial.print(entry.name());
       Serial.print("\t");
       Serial.println(entry.size());
@@ -176,7 +201,11 @@ void SDInterface::runUpdate(String file_name) {
     display_obj.tft.println("Opening " + file_name + "...");
   #endif
 
-  File updateBin = SD.open(file_name);
+  #ifdef USE_SD_MMC
+    File updateBin = SD_MMC.open(file_name);
+  #else
+    File updateBin = SD.open(file_name);
+  #endif
 
   if (updateBin) {
     if(updateBin.isDirectory()){

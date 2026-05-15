@@ -1,24 +1,30 @@
-Folder ---- Libraries+tools
 
-Install libraries - in Windows to C:/users/$USER/documents/Arduino/libraries
-Install tools - in Windows to C:/users/$USER/documents/Arduino/tools                                             
+git clone 
+cd esp32_marauder
+cd libraries+tools
 
-In Arduino boards manager--->Using esp32 2.0.11 from Espressif Systems
+*Install libraries - in Windows to "C:/users/$USER/documents/Arduino/libraries"
+cp /libraries+tools/libraries/  C:/users/$USER/documents/Arduino/libraries/
 
-change stuff in arduino-ide-->tools-->flash size=16mb  //  partition-scheme= Huge app // PSRam= OPI PSRAM // USB-CDC-ON-BOOT=Enabled for UART commands  //
+*Install tools - in Windows to "C:/users/$USER/documents/Arduino/tools"                                             
+cp /libraries+tools/tools/  C:/users/$USER/documents/Arduino/tools/
+
+*In Arduino boards manager--->Using esp32 2.0.11 from Espressif Systems
+
+*change stuff in arduino-ide-->tools-->flash size=16mb  //  partition-scheme= Huge app // PSRam= OPI PSRAM // USB-CDC-ON-BOOT=Enabled for UART commands  //
                                       
-change stuff in arduino-ide-->tools-->board-->esp32-->ESP32S3 Dev Module
+*change stuff in arduino-ide-->tools-->board-->esp32-->ESP32S3 Dev Module
+
+
+*Touch screen is disabled   ///// enable in configs.h  
+*sd card 4 mmc working
+*joystick enabled           ///// disable in configs.h
 
 
 
-*Touch screen is disabled, enable in configs.h  
-*sd card type not supported 
 
-
-
-
-
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 

@@ -554,6 +554,17 @@
       #define BATTERY_ADC_PIN 9
       #define HAS_NEOPIXEL_LED
     #endif
+
+    // --- SD_MMC pins (4-bit mode) ---
+    #define SDMMC_CLK        38
+    #define SDMMC_CMD        40
+    #define SDMMC_D0         39
+    #define SDMMC_D1         41
+    #define SDMMC_D2         48
+    #define SDMMC_D3         47
+
+    // Tell the code we are using SD_MMC, not SPI
+    #define USE_SD_MMC
   #endif
   //// END BOARD FEATURES
 

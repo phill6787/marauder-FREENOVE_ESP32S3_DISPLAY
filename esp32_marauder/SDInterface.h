@@ -9,6 +9,9 @@
 #ifdef HAS_C5_SD
   #include "FS.h"
 #endif
+#ifdef USE_SD_MMC
+  #include "SD_MMC.h"
+#endif
 #include "SD.h"
 #ifdef HAS_C5_SD
   #include "SPI.h"
